@@ -8,7 +8,6 @@ import keyring
 ### Custom Import
 import IGNORE_ios_devices as ios_devices
 
-
 ###### Functions ######
 def send_ios_command(ios_device, ios_command):
     print(f"Connecting to: {ios_device["host"]}")
@@ -17,7 +16,6 @@ def send_ios_command(ios_device, ios_command):
 
 def get_arguments():
     save_to_file = False            # -stf
-    save_credentials = False        # -sc
 
     if len(sys.argv) <= 1:
         print("Error: No arguments provdied")
@@ -29,8 +27,6 @@ def get_arguments():
         arg = sys.argv[index]
         if arg == "-stf":
             save_to_file = True
-        elif arg == "-sc":
-            save_credentials = True
         else:
             ios_command = arg
 
@@ -40,11 +36,10 @@ def get_arguments():
 
     print(f"IOS Command: \"{ios_command}\"")
     print(f"Save results to file = {save_to_file}")
-    print(f"Save Credentials = {save_credentials}")
 
-    return ios_command, save_to_file, save_credentials
+    return ios_command, save_to_file
 
-def get_cred(search_target, save_cred):
+def get_cred(search_target):
     mapping = {
         "username" : "Py_Cisco_IOS_Commands_Username",
         "password" : "Py_Cisco_IOS_Commands_Password",
@@ -56,20 +51,18 @@ def get_cred(search_target, save_cred):
         return cred
     else:           # return credentials if found
         return cred
-    
-    
+       
 ###### Main ######
-ios_command, save_to_file, save_credentials = get_arguments()
+ios_command, save_to_file = get_arguments()
 max_threads = 10
 
-
 ios_device_template = {
-    #"device_type": "cisco_ios_telnet",
-    "device_type": "cisco_ios",
+    "device_type": "cisco_ios_telnet",
+    #"device_type": "cisco_ios",
     "host": "69.69.69.69",
-    "username": get_cred("username", save_credentials),
-    "password": get_cred("password", save_credentials),
-    "secret" :  get_cred("enable", save_credentials),
+    "username": get_cred("username"),
+    "password": get_cred("password"),
+    "secret" :  get_cred("enable"),
 }
 
 # Build device list
