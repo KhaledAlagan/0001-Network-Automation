@@ -6,26 +6,32 @@ import sys
 ### Custom Import
 import ignore_devices as devices
 
-### Functions ###
-def send_command(ios_device, ios_command):
+###### Functions ######
+def send_ios_command(ios_device, ios_command):
     print(f"Connecting to: {ios_device["host"]}")
     with ConnectHandler(**ios_device) as net_connect:
         return [ios_device["host"], net_connect.send_command(ios_command)]
 
-### Main ###
-if len(sys.argv) < 2:
-    print("No IOS Command provided")
-    sys.exit()
+def get_arguments():
+    # IOS Command
+    if len(sys.argv) < 2:
+        print("No IOS Command provided")
+        sys.exit()
+    else:
+        ios_command = sys.argv[1]
+        print(f"Running command: \"{ios_command}\"")
 
-save_to_file = False
-if len(sys.argv) == 3:
-    if sys.argv[2] == "-save":
-        save_to_file = True
-        print("Saving result to file = True")
+    # Save to file
+    save_to_file = False
+    if len(sys.argv) == 3:
+        if sys.argv[2] == "-save":
+            save_to_file = True
+            print("Saving result to file = True")
 
+    return ios_command, save_to_file
 
-ios_command = sys.argv[1]
-print(f"Running command: \"{ios_command}\"")
+###### Main ######
+ios_command, save_to_file = get_arguments()
 max_threads = 10
 
 # Build device list
@@ -38,7 +44,7 @@ for device_name, device_ip in devices.ios_devices.items():
 # Start threads
 with ThreadPoolExecutor(max_workers=max_threads) as executor:
     # Map applies the function to every item concurrently
-    results = executor.map(send_command, device_list, repeat(ios_command))
+    results = executor.map(send_ios_command, device_list, repeat(ios_command))
     # Iterate over results (blocks until each item is ready)
     for result in results:
         device_ip = result[0]
