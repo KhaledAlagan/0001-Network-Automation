@@ -2,5 +2,5 @@
 General network automation tools
 
 # Dependencies
-- netmiko
-- keyring
+- netmiko   https://netmiko.org/
+- keyring   https://pypi.org/project/keyring/
