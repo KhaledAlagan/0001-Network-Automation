@@ -2,4 +2,5 @@
 General network automation tools
 
 # Dependencies
-- Netmiko
+- netmiko
+- keyring
