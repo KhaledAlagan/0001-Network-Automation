@@ -19,7 +19,7 @@ def get_arguments():
 
     if len(sys.argv) <= 1:
         print("Error: No arguments provdied")
-        print("Example: ios_command -stf (Save to file) -sc (Save Credentials)")
+        print("Example: ios_command -stf (Save output to file)")
         sys.exit(1)
 
     ios_command = None
