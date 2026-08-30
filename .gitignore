@@ -2,3 +2,4 @@
 ignore*
 IGNORE*
 __pycache__
+.venv
