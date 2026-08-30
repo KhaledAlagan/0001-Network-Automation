@@ -15,11 +15,12 @@ def send_ios_command(ios_device, ios_command):
         return [ios_device["host"], net_connect.send_command(ios_command)]
 
 def get_arguments():
-    save_to_file = False            # -stf
+    save_to_file = False                    # -stf
+    save_to_multi_file = False              # -stmf
 
     if len(sys.argv) <= 1:
         print("Error: No arguments provdied")
-        print("Example: ios_command -stf (Save output to file)")
+        print("Example: ios_command -stf (Save output file)")
         sys.exit(1)
 
     ios_command = None
@@ -27,6 +28,8 @@ def get_arguments():
         arg = sys.argv[index]
         if arg == "-stf":
             save_to_file = True
+        elif arg == "-stmf":
+            save_to_multi_file = True
         else:
             ios_command = arg
 
@@ -37,7 +40,7 @@ def get_arguments():
     print(f"IOS Command: \"{ios_command}\"")
     print(f"Save results to file = {save_to_file}")
 
-    return ios_command, save_to_file
+    return ios_command, save_to_file, save_to_multi_file
 
 def get_cred(search_target):
     mapping = {
@@ -53,7 +56,7 @@ def get_cred(search_target):
         return cred
        
 ###### Main ######
-ios_command, save_to_file = get_arguments()
+ios_command, save_to_file, save_to_multi_file = get_arguments()
 max_threads = 10
 
 ios_device_template = {
@@ -73,18 +76,29 @@ for device_name, device_ip in ios_devices.ios_devices.items():
     device_list.append(ios_device)
 
 # Start threads
+result_list = []
 with ThreadPoolExecutor(max_workers=max_threads) as executor:
     # Map applies the function to every item concurrently
     results = executor.map(send_ios_command, device_list, repeat(ios_command))
     # Iterate over results (blocks until each item is ready)
     for result in results:
-        device_ip = result[0]
-        result_text = result[1]
-        print_text = f"==== Host:{device_ip}\n{result_text}"
-        if save_to_file == True:
-            with open(f"HOST-{device_ip}.txt", "w", encoding="utf-8") as file:
-                file.write(print_text)
-        else:
-            print(print_text)
+        result_list.append(result)
+
+# Create result string
+
+# Save data
+for result in result_list:
+    device_ip = result[0]
+    result_text = result[1]
+    print_text = f"==== Host:{device_ip}\n{result_text}"
+    if save_to_multi_file == True:
+        with open(f"HOST-{device_ip}.txt", "w", encoding="utf-8") as file:
+            file.write(print_text)
+    elif save_to_file == True:
+        #open("HOST-Results.txt", "w").close()
+        with open(f"HOST-Results.txt", "a", encoding="utf-8") as file:
+            file.write(print_text + "\n")
+    else:
+        print(print_text)
 
 print("All threads finished execution!")
