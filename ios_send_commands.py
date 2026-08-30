@@ -85,6 +85,7 @@ with ThreadPoolExecutor(max_workers=max_threads) as executor:
         result_list.append(result)
 
 # Create result string
+result_string = ""
 
 # Save data
 for result in result_list:
